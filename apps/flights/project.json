@@ -66,6 +66,7 @@
         "name": "flights",
         "hostUrl": "https://sonarcloud.io",
         "projectKey": "breexio_test_sonar_test_flights",
+        "organization": "lionel22",
         "skipTargetDefaults": false,
         "branches": false,
         "qualityGate": true,

@@ -4,6 +4,12 @@ on:
     branches:
       - main
   pull_request:
+    types: [ opened, synchronize ]
+    branches:
+      - main
+
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 jobs:
   main:
@@ -13,10 +19,22 @@ jobs:
         with:
           fetch-depth: 0
       - uses: nrwl/nx-set-shas@v3
-      - run: npm ci
 
-      - run: npx nx format:check
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        id: cache-nodemodules
+        with:
+          path: |
+            ~/.npm
+          key: ${{ runner.os }}-nodemodules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nodemodules-
+
+      - name: Install dependencies
+        if: ${{ steps.cache-nodemodules.outputs.cache-hit != 'true' }}
+        run: npm ci
+
       - run: npx nx affected -t lint --parallel=3
       - run: npx nx affected -t test --parallel=3 --configuration=ci
       - run: npx nx affected -t build --parallel=3
-      - run: npx nx affected --target sonar --parallel=1
+      - run: SONAR_TOKEN=${{ env.SONAR_TOKEN }} npx nx affected --target sonar --parallel=1
