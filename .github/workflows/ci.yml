@@ -4,7 +4,7 @@ on:
     branches:
       - main
   pull_request:
-    types: [ opened ]
+    types: [ opened, synchronize ]
     branches:
       - main
 
@@ -37,9 +37,4 @@ jobs:
       - run: npx nx affected -t lint --parallel=3
       - run: npx nx affected -t test --parallel=3 --configuration=ci
       - run: npx nx affected -t build --parallel=3
-      - run: |
-          echo ${{ env.SONAR_TOKEN }}
-          ${{ env.SONAR_TOKEN }}
-        shell: bash
-
-      - run: SONAR_TOKEN= ${{ env.SONAR_TOKEN }} npx nx affected --target sonar --parallel=1
+      - run: SONAR_TOKEN=${{ env.SONAR_TOKEN }} npx nx affected --target sonar --parallel=1
